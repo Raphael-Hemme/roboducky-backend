@@ -1,14 +1,14 @@
-var express = require('express');
-var duckiesRouter = express.Router();
+const express = require('express');
+const duckiesRouter = express.Router();
 const duckyController = require('../controllers/duckyController');
-const authorizeDucky = require('../middleware/authorizeDucky');
+const authorizeDucky = require('../middlewares/authorizeDucky');
 
 
-duckiesRouter.get('/', authorizeDucky, DuckyController.list_ducky);
+duckiesRouter.get('/', duckyController.list_duckies);
 duckiesRouter.get('/:id', duckyController.find_ducky);
 duckiesRouter.post('/', duckyController.create_ducky);
-duckiesRouter.put('/', duckyController.update_ducky);
-duckiesRouter.delete('/:id', authorizeDucky, DuckyController.delete_ducky)
+duckiesRouter.put('/', authorizeDucky, duckyController.update_ducky);
+duckiesRouter.delete('/:id', authorizeDucky, duckyController.delete_ducky)
 
 
 module.exports = duckiesRouter;
