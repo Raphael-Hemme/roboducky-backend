@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 const conversationSchema = new Schema({
-  conv_date: Date,
-  conv_description: String,
-  conv_solution: String,
-  tags: [{ type: Schema.Types.ObjectId, ref: "nameOfYourOtherModel" }],
-  auto_keywords: [{ type: Schema.Types.ObjectId, ref: "nameOfYourOtherModel" }],
+  convDate: Date,
+  convDescription: String,
+  convSolution: String,
+  tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
+  autoKeywords: { type: Array},
   links: {type: Array},
-  code_snippet: String,
+  codeSnippet: String,
   mood: {type: Array},
 })
 
