@@ -7,14 +7,22 @@ const { authorizeDucky, duckyContext } = require('../middlewares/authorizeDucky'
 
 //conversationsRouter.get('/', conversationController.list_conversations);
 
+///////// Create Whole new conversation ////////////
 conversationsRouter.post('/', authorizeDucky, duckyContext, conversationController.create_conversation);
-/* conversationsRouter.put('/convDescription', conversationController.update_convDescription);
+
+///////// Update conversation fields ////////////
+conversationsRouter.put('/convDescription', conversationController.update_convDescription);
 conversationsRouter.put('/convSolution', conversationController.update_convSolution);
 conversationsRouter.put('/convTags', conversationController.update_convTags);
 conversationsRouter.put('/convLinks', conversationController.update_convLinks);
-conversationsRouter.put('/convCodeSnippet', conversationController.update_convCodeSnippet); */
-conversationsRouter.get('/:convId', conversationController.find_conversation_by_convId);
-//conversationsRouter.delete('/:convId', authorizeDucky, conversationController.delete_conversation)
+conversationsRouter.put('/convCodeSnippet', conversationController.update_convCodeSnippet);
+
+///////// Get conversations ////////////
+conversationsRouter.get('/convId/:convId', conversationController.find_conversation_by_convId);
+conversationsRouter.get('/', authorizeDucky, duckyContext, conversationController.find_conversation_by_duckyId);
+
+///////// Delete an individual conversation ////////////
+conversationsRouter.delete('/delete/:convId', authorizeDucky, duckyContext, conversationController.delete_conversation)
 
 
 module.exports = conversationsRouter;

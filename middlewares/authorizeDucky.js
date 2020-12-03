@@ -16,13 +16,14 @@ const authorizeDucky = (req, res, next) => {
 const duckyContext = async (req, res, next) => {
 //  const ducky = Ducky.findOne({ _id: req.data._id });
   const ducky = await Ducky.findById(req.data._id).exec();
-  console.log({ducky})
+//  console.log({ducky})
   if (!ducky) return res.status(404).send("This ducky has not hatched yet.")
 //const { password, ...duckyWithoutPassword } = ducky
 // I addid this one to make it a bit safer and not per accident send the PW into the FE.
 // On testing it with Postman, it worked, biut if trouble arises, delete the declaration of duckyWithoutWassword
 // and assign req.ducky to ducky instead of duckyWithoutPassword
   const duckyWithoutPassword = {
+    _id: ducky._id,
     userName: ducky.userName,
     userEmail: ducky.userEmail,
     duckyName: ducky.duckyName,

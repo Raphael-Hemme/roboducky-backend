@@ -28,7 +28,7 @@ exports.create_conversation = async (req, res) => {
 
 }
 
-////////// Retrieve conversation by conversation id //////////
+////////// Find conversation by conversation id //////////
 exports.find_conversation_by_convId = (req, res) => {
   const { convId } = req.params
   Conversation.findById(convId)//.populate('duckyId')
@@ -37,34 +37,40 @@ exports.find_conversation_by_convId = (req, res) => {
 }
 
 ////////// Retrieve all conversations from this ducky //////////
-
+exports.find_conversation_by_duckyId = async (req, res) => {
+  const { _id } = req.ducky
+  try {
+    let duckyMemory = await Conversation.find({ duckyId: _id }).exec();
+    res.status(200).json(duckyMemory)
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 ////////// Retrieve conversations from this ducky with specific tag(s) //////////
 
 
 
 ////////// Update a convDescription by id //////////
-/* exports.update_convDescription = (req, res) => {
+exports.update_convDescription = (req, res) => {
   const { convId, new_description } = req.body  // Is that correct?
-  Conversation.updateOne({ _id: convId, convDescription: new_description })
+  Conversation.updateOne({ _id: convId}, {convDescription: new_description })
     .then(data => res.json(data))
     .catch(err => console.error(err.message))
-} */
+} 
 
 ////////// Update a convSolution by id //////////
-/* exports.update_convSolution = (req, res) => {
+exports.update_convSolution = (req, res) => {
   const { convId, new_solution } = req.body
-  const conversationToUpdate = await Conversation.findOne(convId)
-  conversationToUpdate.convSolution = new_solution;
-  await 
+  Conversation.updateOne({ _id: convId}, {convTags: new_tags })
     .then(data => res.json(data))
     .catch(err => console.error(err.message))
-} */
+} 
 
 ////////// Update a convTags by id //////////
 exports.update_convTags = (req, res) => {
   const { convId, new_tags } = req.body
-  Conversation.updateOne({ _id: convId, convTags: new_tags })
+  Conversation.updateOne({ _id: convId}, {convTags: new_tags })
     .then(data => res.json(data))
     .catch(err => console.error(err.message))
 }
@@ -72,7 +78,7 @@ exports.update_convTags = (req, res) => {
 ////////// Update a convTags by id //////////
 exports.update_convLinks = (req, res) => {
   const { convId, new_links } = req.body
-  Conversation.updateOne({ _id: convId, convLinks: new_links })
+  Conversation.updateOne({ _id: convId}, {convLinks: new_links })
     .then(data => res.json(data))
     .catch(err => console.error(err.message))
 }
@@ -80,10 +86,19 @@ exports.update_convLinks = (req, res) => {
 ////////// Update a convCodeSnippet by id //////////
 exports.update_convCodeSnippet = (req, res) => {
   const { convId, new_codeSnippet } = req.body
-  Conversation.updateOne({ _id: convId, convCodeSnippet: new_codeSnippet })
+  Conversation.updateOne({ _id: convId}, {convCodeSnippet: new_codeSnippet })
     .then(data => res.json(data))
     .catch(err => console.error(err.message))
 }
 
-////////// Delete a convCodeSnippet by id //////////
-
+////////// Delete an entire conversation by id //////////
+exports.delete_conversation = async (req, res) => {
+  const { convId } = req.params;
+  const { _id } = req.ducky;
+  try { 
+    await Conversation.deleteOne({ _id: convId })
+    res.status(200).send('Conversation deleted.')
+  } catch (err) {
+    console.error(err.message)
+  }
+}
