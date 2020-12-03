@@ -11,7 +11,7 @@ const duckySchema = new Schema({
 })
 
 duckySchema.methods.createToken = function() {
-  const payload = { _id: this._id, email: this.userEmail }
+  const payload = { _id: this._id, name: this.userName }
   const secretKey = process.env.JWT_SECRET
   const token = jwt.sign(payload, secretKey, { expiresIn: "3h"})
   return token

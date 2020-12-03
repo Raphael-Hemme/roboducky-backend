@@ -1,7 +1,7 @@
 const express = require('express');
 const duckiesRouter = express.Router();
 const duckyController = require('../controllers/duckyController');
-const authorizeDucky = require('../middlewares/authorizeDucky');
+const { authorizeDucky } = require('../middlewares/authorizeDucky');
 //const authenticationController = require('../controllers/authenticationController');
 
 
