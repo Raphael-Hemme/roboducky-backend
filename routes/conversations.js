@@ -7,7 +7,7 @@ const { authorizeDucky, duckyContext } = require('../middlewares/authorizeDucky'
 
 //conversationsRouter.get('/', conversationController.list_conversations);
 
-///////// Create Whole new conversation ////////////
+///////// Create whole new conversation ////////////
 conversationsRouter.post('/', authorizeDucky, duckyContext, conversationController.create_conversation);
 
 ///////// Update conversation fields ////////////
@@ -20,11 +20,11 @@ conversationsRouter.put('/convCodeSnippet', conversationController.update_convCo
 ///////// Get conversations ////////////
 conversationsRouter.get('/convId/:convId', conversationController.find_conversation_by_convId);
 conversationsRouter.get('/', authorizeDucky, duckyContext, conversationController.find_conversation_by_duckyId);
+conversationsRouter.get('/tagsearch', conversationController.find_conversation_by_tag);
 
 ///////// Delete an individual conversation ////////////
 conversationsRouter.delete('/delete/:convId', authorizeDucky, duckyContext, conversationController.delete_conversation)
 
 
 module.exports = conversationsRouter;
-
 

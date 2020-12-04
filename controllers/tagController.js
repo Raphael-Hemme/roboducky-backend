@@ -24,9 +24,19 @@ exports.create_tag = async (req, res) => {
   const { convId } = req.params
   try {
     let newTag = await Tag.findOne( { tagName })
-    if ( newTag ) return res.status(400).send('This tag already exists')
-    newTag = new Tag({ tagName })
+     // The whole condition block is skipped... probably because auf async - await. How do I change that?
+    if ( newTag && newTag.conversationId.includes(convId) ) {
+      return res.send('This conversation is already tagged with this tag.')
+    } else if ( newTag ) {
+      await Tag.findByIdAndUpdate(newTag._id, { $push: { conversationId: convId } })
+      return res.send('This tag existed already but it was assigned to this')
+
+
+      
+    } else {
+      newTag = new Tag({ tagName, conversationId: convId })
     await newTag.save()
+    }
     console.log('tag created: ', newTag.tagName )
     console.log('tag created: ', newTag._id )  
     await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
@@ -34,6 +44,7 @@ exports.create_tag = async (req, res) => {
     res.status(200).send('Tag created')
   } catch(e) {
     console.error(e.message)
+    res.status(500)
   }
 }
 
