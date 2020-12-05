@@ -21,27 +21,22 @@ exports.find_tag = (req, res) => {
 
 exports.create_tag = async (req, res) => {
   const { tagName } = req.body
-  const { convId } = req.params
+  const { convId } = req.params //change to rtrieve convId from req.conversation by including another middleware
   try {
     let newTag = await Tag.findOne( { tagName })
-     // The whole condition block is skipped... probably because auf async - await. How do I change that?
     if ( newTag && newTag.conversationId.includes(convId) ) {
       return res.send('This conversation is already tagged with this tag.')
     } else if ( newTag ) {
       await Tag.findByIdAndUpdate(newTag._id, { $push: { conversationId: convId } })
-      return res.send('This tag existed already but it was assigned to this')
-
-
-      
+      await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
+      return res.send('This tag existed already but it was assigned to this conversation')
     } else {
       newTag = new Tag({ tagName, conversationId: convId })
-    await newTag.save()
+      await newTag.save()
+      await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
+      console.log('tag id pushed to conversation tag-array')
+      res.status(200).send('Tag created') 
     }
-    console.log('tag created: ', newTag.tagName )
-    console.log('tag created: ', newTag._id )  
-    await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
-    console.log('tag id pushed to conversation tag-array') 
-    res.status(200).send('Tag created')
   } catch(e) {
     console.error(e.message)
     res.status(500)

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 const conversationSchema = new Schema({
   duckyId: { type: Schema.Types.ObjectId, ref: "Ducky" },
-  convDate: Date,
+  convDate: { type: Date, required: true, default: Date.now },
   convDescription: String,
   convSolution: String,
   convTags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],

@@ -121,15 +121,19 @@ exports.update_convCodeSnippet = (req, res) => {
 exports.delete_conversation = async (req, res) => {
   const { convId } = req.params;
   const duckyId = req.ducky._id;
-  console.log('duckyID from req.ducky', duckyId)
- 
+  console.log(duckyId.toString())
+
   const conversationToDelete = await Conversation.findOne({ _id: convId })
-  console.log('duckyID from conversation', conversationToDelete.duckyId) 
+  let convToDelId= conversationToDelete.duckyId
   
-  if (conversationToDelete.duckyId !== duckyId) return res.status(401).send('Access denied!') // Both duckyIds are identical and still the condition block is run. Why?
+  console.log(convToDelId.toString()) 
   try { 
-    await Conversation.deleteOne({ _id: convId })
-    res.status(200).send('Conversation deleted.')
+    if (convToDelId.toString() === duckyId.toString()) {
+      await Conversation.deleteOne({ _id: convId })
+      res.status(200).send('Conversation deleted.')
+    } else {
+      res.status(401).send('Access denied!') // Both duckyIds are identical and still the condition block is run. Why?
+    }
   } catch (err) {
     console.error(err.message)
   }
