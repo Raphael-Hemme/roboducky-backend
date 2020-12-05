@@ -40,25 +40,33 @@ exports.find_conversation_by_convId = (req, res) => {
 
 ////////// Retrieve all conversations from this ducky //////////
 exports.find_conversation_by_duckyId = async (req, res) => {
-  const { _id } = req.ducky
+  const duckyId = req.ducky._id.toString()
   try {
-    let duckyMemory = await Conversation.find({ duckyId: _id }).exec();
-    res.status(200).json(duckyMemory)
+    if ( !duckyId ) {
+      return res.status(404).send('Your ducky has not hatched yet.')
+    } else {
+      let duckyMemory = await Conversation.find({ duckyId: duckyId }).exec();
+      console.log(`User ${duckyId} requested all his previous conversations. Conversations have been sent.`)
+      res.status(200).json(duckyMemory)
+    }
   } catch (err) {
     console.error(err)
   }
 }
 
 ////////// Retrieve conversations from this ducky with specific tag(s) //////////
+//This works. But it sends ALL results with the respective tags. So also the results of other duckies.
 exports.find_conversation_by_tag = async (req, res) => {
-  const { tagName } = req.body
-  console.log('tagName: ', tagName)
-  const searchTag = await Tag.findOne({ tagName: tagName }).exec();
-  console.log({searchTag})
+  const { searchTags } = req.body
+  console.log('searchTags: ', searchTags)
+  let searchResult = []
   try {
-    let duckyMemory = await Conversation.find({ convTags: { $all: [searchTag._id] } }).exec();
-    console.log({duckyMemory})
-    res.status(200).json(duckyMemory)
+    for(let tag of searchTags ){
+      let loopResult = await Tag.find({ tagName: tag }).populate('conversationId').exec();
+      searchResult.push(loopResult);
+    }
+    console.log(searchResult)
+    res.status(200).json(searchResult)
   } catch (err) {
     console.error(err)
   }
@@ -120,19 +128,23 @@ exports.update_convCodeSnippet = (req, res) => {
 ////////// Delete an entire conversation by id //////////    --- Here not even the author of a conversation is able to delete it -> access denied.
 exports.delete_conversation = async (req, res) => {
   const { convId } = req.params;
-  const duckyId = req.ducky._id;
-  console.log(duckyId.toString())
+  const duckyId = req.ducky._id.toString();
+//  console.log(duckyId.toString())
 
   const conversationToDelete = await Conversation.findOne({ _id: convId })
-  let convToDelId= conversationToDelete.duckyId
-  
-  console.log(convToDelId.toString()) 
-  try { 
-    if (convToDelId.toString() === duckyId.toString()) {
-      await Conversation.deleteOne({ _id: convId })
-      res.status(200).send('Conversation deleted.')
+  let convToDelId= conversationToDelete.duckyId.toString()
+
+//  console.log(convToDelId.toString()) 
+  try {
+    if ( !convId ) {
+      res.status(500).send('Your ducky does not remember such a conversation.')
+    } else if ( convToDelId !== duckyId ) {
+      console.log(`A user with id: ${duckyId} has tried to delete a conversation created by another user with the id: ${convToDelId}. Access has been denied.`) 
+      res.status(401).send('Your ducky does not remember such a conversation.')
     } else {
-      res.status(401).send('Access denied!') // Both duckyIds are identical and still the condition block is run. Why?
+      await Conversation.deleteOne({ _id: convId })
+      console.log(`The user with id: ${duckyId} has deleted a conversation. Access has been granted.`)
+      res.status(200).send('Conversation deleted.')
     }
   } catch (err) {
     console.error(err.message)
