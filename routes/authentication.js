@@ -13,7 +13,8 @@ authenticationRouter.get('/secret', authorizeDucky, (req, res) => {
 });
 
 authenticationRouter.get('/me', [authorizeDucky, duckyContext], (req, res) => {
-  res.send(req.user)
+  console.log(req.ducky)
+  res.send(req.ducky)
 })
 
 module.exports = authenticationRouter;

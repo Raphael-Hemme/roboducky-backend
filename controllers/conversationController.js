@@ -11,10 +11,10 @@ exports.create_conversation = async (req, res) => {
     duckyId: _id,
     convDescription,
     convSolution,
-    convTags,
-    convLinks,
-    convCodeSnippet,
-    convMood
+//    convTags, -> try to find one and use id
+//    convLinks,
+//    convCodeSnippet,
+    convMood: [convMood]
   })
 
   try {
@@ -55,7 +55,11 @@ exports.find_conversation_by_duckyId = async (req, res) => {
 }
 
 ////////// Retrieve conversations from this ducky with specific tag(s) //////////
-//This works. But it sends ALL results with the respective tags. So also the results of other duckies.
+
+// This works. But it sends ALL results with the respective tags. So also the results of other duckies.
+// And it pushes arrays into an array. And does not send results only when all tags are present. 
+// -> Rework the implementation later. Start from the results of the obvoe find_conversation_by_duckyId method.
+
 exports.find_conversation_by_tag = async (req, res) => {
   const { searchTags } = req.body
   console.log('searchTags: ', searchTags)
