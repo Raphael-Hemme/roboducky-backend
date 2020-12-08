@@ -5,7 +5,7 @@ exports.login = async (req, res) => {
   const { userName, password } = req.body
 
   let ducky = await Ducky.findOne({ userName })
-  console.log(ducky)
+  console.log({ducky})
 
   if (!ducky) return res.status(400).send('Invalid Credentials')
 

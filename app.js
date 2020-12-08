@@ -8,6 +8,8 @@ const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const duckiesRouter = require('./routes/duckies');
+const conversationsRouter = require('./routes/conversations');
+const tagsRouter = require('./routes/tags');
 const authenticationRouter = require('./routes/authentication');
 
 const app = express();
@@ -24,6 +26,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/duckies', duckiesRouter);
+app.use('/tags', tagsRouter);
+app.use('/conversations', conversationsRouter);
 app.use('/auth', authenticationRouter);
 
 module.exports = app;

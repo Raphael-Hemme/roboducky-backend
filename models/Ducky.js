@@ -7,7 +7,8 @@ const duckySchema = new Schema({
   userName: {type: String, min: 2, max: 50, required: true},
   userEmail: {type: String, min: 3, max: 50, required: true},
   password: {type: String, min: 4, required: true},
-  duckyName: {type: String, min: 2, max: 50, required: true}
+  duckyName: {type: String, min: 2, max: 50, required: true},
+  conversationIds: [{ type: Schema.Types.ObjectId, ref: "Conversation" }]
 })
 
 duckySchema.methods.createToken = function() {
