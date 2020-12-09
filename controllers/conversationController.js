@@ -17,12 +17,49 @@ exports.create_conversation = async (req, res) => {
     convMood: [convMood]
   })
 
+  const findAndUpdateTags = async (convId) => {
+    console.log('Inside findAndUpdateTags')
+    console.log(convTags)
+    for(el of convTags) {
+      async (el) => {
+        try {
+          console.log('inside Try')
+          
+          let newTag = await Tag.findOne( { tagName: el })
+          console.log(newTag)
+          if ( newTag ) {
+            console.log('inside newTag')
+            console.log(newTag._id)
+            await Tag.findByIdAndUpdate(newTag._id, { $push: { conversationId: convId } })
+            await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
+            console.log('still inside newTag')
+            console.log('This tag existed already but it was assigned to this conversation')
+          } else {
+            /* newTag = new Tag({ tagName: el, conversationId: convId })
+            await newTag.save()
+            await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
+            console.log('tag id pushed to conversation tag-array')
+            res.status(200).send('Tag created')  */
+            console.log('inside else')
+          }
+        } catch(e) {
+          console.error(e.message)
+          res.status(500)
+        }
+      }
+    }
+  }
+  
+
   try {
     // push all the tags into the tag create....
     await newConversation.save()
     console.log({duckyId: _id})
     console.log({newConversationId: newConversation._id})
     await Ducky.findByIdAndUpdate(_id, { $push: { conversations: newConversation._id } })
+  // new tag part... remove stuff between these comments if it breaks
+    await findAndUpdateTags(newConversation._id)      
+  // new tag part... remove stuff between these comments if it breaks
     res.status(200).json(newConversation)
   } catch (err) {
     console.error(err)
