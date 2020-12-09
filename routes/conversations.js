@@ -20,7 +20,7 @@ conversationsRouter.put('/convCodeSnippet', conversationController.update_convCo
 ///////// Get conversations ////////////
 conversationsRouter.get('/convId/:convId', conversationController.find_conversation_by_convId);
 conversationsRouter.get('/', authorizeDucky, duckyContext, conversationController.find_conversation_by_duckyId);
-conversationsRouter.get('/tagsearch', conversationController.find_conversation_by_tag);
+conversationsRouter.get('/tagsearch', authorizeDucky, duckyContext, conversationController.find_conversation_by_tag);
 
 ///////// Delete an individual conversation ////////////
 conversationsRouter.delete('/delete/:convId', authorizeDucky, duckyContext, conversationController.delete_conversation)
