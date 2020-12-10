@@ -17,8 +17,6 @@ exports.create_conversation = async (req, res) => {
     convMood: [convMood]
   })
 
-  
-
   try {
     // push all the tags into the tag create....
     await newConversation.save()
@@ -80,27 +78,23 @@ exports.find_conversation_by_duckyId = async (req, res) => {
 // -> Rework the implementation later. Start from the results of the obvoe find_conversation_by_duckyId method.
 
 exports.find_conversation_by_tag = async (req, res) => {
-  const { searchTags } = req.body
+  // const { searchTags } = req.body
+  const tags = req.query.tags
+  console.log(tags)
   const duckyId = req.ducky._id.toString()
-
-  console.log('searchTags: ', searchTags)
-  
   try {
     if ( !duckyId ) {
       res.status(404).send('Your ducky has not hatched yet.')
     } else {
+      let searchResult;
       (async () => {
-        const tagsPromise = searchTags.map(async (tag) => await Tag.findOne( { tagName: tag }))
+        const tagsPromise = tags.map(async (tag) => await Tag.findOne( { tagName: tag }))
         const resolvedTags = await Promise.all(tagsPromise)
-        const tagNameToId = resolvedTags.map(el => `{ _id: ${el._id}}`) //{"$oid":"5fd0a9305a55859ea1022d1e"} - {'$oid:'+el._id}
+        const tagNameToId = resolvedTags.map(el => el._id) //{"$oid":"5fd0a9305a55859ea1022d1e"} - {'$oid:'+el._id}
         console.log(tagNameToId)
-        const searchResult = await Conversation.find({ convTags: { $all: tagNameToId } })
-        const resolvedResults = await Promise.all(searchResult)
-        console.log(resolvedResults)
+        searchResult = await Conversation.find({ convTags: { $all: tagNameToId } })
+        res.status(200).send(searchResult)
       })()
-      
-      res.status(200).send('The way is the goal')
-
     }
   } catch (err) {
     console.error(err)
