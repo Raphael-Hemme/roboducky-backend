@@ -22,7 +22,24 @@ exports.create_conversation = async (req, res) => {
     await newConversation.save()
     console.log({duckyId: _id})
     console.log({newConversationId: newConversation._id})
-    await Ducky.findByIdAndUpdate(_id, { $push: { conversations: newConversation._id } })
+    await Ducky.findByIdAndUpdate(_id, { $push: { conversations: newConversation._id } });
+  // new tag part... remove stuff between these comments if it breaks
+  (async (convId) => {
+    const tagsPromise = convTags.map(async (tag) => await Tag.findOne( { tagName: tag }))
+    const resolvedTags = await Promise.all(tagsPromise)
+
+    resolvedTags.forEach(async (tag, i) => {
+        if (tag) {
+          await Tag.findByIdAndUpdate(tag._id, { $push: { conversationId: convId } }, { new: true })
+          await Conversation.findByIdAndUpdate(convId, { $push: { convTags: tag._id } }, { new: true })
+        } else {
+          newTag = new Tag({ tagName: convTags[i], conversationId: convId })
+          await newTag.save()
+          await Conversation.findByIdAndUpdate(convId, { $push: { convTags: newTag._id } })
+        }
+    })
+  })(newConversation._id)
+  // new tag part... remove stuff between these comments if it breaks
     res.status(200).json(newConversation)
   } catch (err) {
     console.error(err)
@@ -43,7 +60,7 @@ exports.find_conversation_by_duckyId = async (req, res) => {
   const duckyId = req.ducky._id.toString()
   try {
     if ( !duckyId ) {
-      return res.status(404).send('Your ducky has not hatched yet.')
+      res.status(404).send('Your ducky has not hatched yet.')
     } else {
       let duckyMemory = await Conversation.find({ duckyId: duckyId }).exec();
       console.log(`User ${duckyId} requested all his previous conversations. Conversations have been sent.`)
@@ -61,16 +78,24 @@ exports.find_conversation_by_duckyId = async (req, res) => {
 // -> Rework the implementation later. Start from the results of the obvoe find_conversation_by_duckyId method.
 
 exports.find_conversation_by_tag = async (req, res) => {
-  const { searchTags } = req.body
-  console.log('searchTags: ', searchTags)
-  let searchResult = []
+  // const { searchTags } = req.body
+  const tags = req.query.tags
+  console.log(tags)
+  const duckyId = req.ducky._id.toString()
   try {
-    for(let tag of searchTags ){
-      let loopResult = await Tag.find({ tagName: tag }).populate('conversationId').exec();
-      searchResult.push(loopResult);
+    if ( !duckyId ) {
+      res.status(404).send('Your ducky has not hatched yet.')
+    } else {
+      let searchResult;
+      (async () => {
+        const tagsPromise = tags.map(async (tag) => await Tag.findOne( { tagName: tag }))
+        const resolvedTags = await Promise.all(tagsPromise)
+        const tagNameToId = resolvedTags.map(el => el._id) //{"$oid":"5fd0a9305a55859ea1022d1e"} - {'$oid:'+el._id}
+        console.log(tagNameToId)
+        searchResult = await Conversation.find({ convTags: { $all: tagNameToId } })
+        res.status(200).send(searchResult)
+      })()
     }
-    console.log(searchResult)
-    res.status(200).json(searchResult)
   } catch (err) {
     console.error(err)
   }

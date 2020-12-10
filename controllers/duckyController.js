@@ -24,7 +24,8 @@ exports.create_ducky = async (req, res) => {
     ducky = new Ducky({ userName, userEmail, duckyName, password: await bcrypt.hash(password, 10) })
     await ducky.save()
     const token = ducky.createToken()
-    res.set('x-authorization-token', token).send({ _id: ducky._id, username: ducky.userName})
+    console.log('New token created')
+    res.set('x-authorization-token', token).send("Signup successful!")
   } catch(e) {
     console.error(e.message)
   }
