@@ -64,4 +64,4 @@ Roboducky is the outcome of my final project of my training at WBS coding school
 
 Currently roboducky is still in pre-release (v. 0.8 or 0.9? ;) ). Once the list of WIP is implemented, it will be happy to meet you.
 
-Thanks a lot to the whole staff and especially to @MyElectricSheep for the guidance and inspiration for this project!
+Thanks a lot to the whole staff and especially to @Electric_Sheep for the guidance and inspiration for this project!
